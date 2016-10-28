@@ -11,18 +11,20 @@ var coreFrame =
      * **/
     SafeTransfer : function(creep, target)
     {
-        creep.say("Переношу..");
         if(creep.transfer(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE)
             creep.moveTo(target);
+        else
+            creep.say("Переношу..");
     },
     /** @param {Creep} creep **/
     SafeHarvest : function (creep)
     {
-        creep.say("Добываю..");
         var source = creep.pos.findClosestByPath(FIND_SOURCES);
 
         if(creep.harvest(source) == ERR_NOT_IN_RANGE)
             creep.moveTo(source);
+        else
+            creep.say("Добываю..");
     },
     /** @param {Creep|Spawn|Structure} target
      *  @param {Creep} creep
@@ -44,10 +46,19 @@ var coreFrame =
         else
             creep.say("Строю..");
     },
+    /** @param {Spawn|Structure} target
+     *  @param {Creep} creep
+     * **/
+    SafeRepair : function (creep, target)
+    {
+        if(creep.repair(target) == ERR_NOT_IN_RANGE)
+            creep.moveTo(target);
+        else
+            creep.say("Чиню..");
+    },
     /** @param {Creep} creep **/
     ObtainMemory : function(creep)
     {
-        creep.say("|KERNEL UPDATE|");
         if(creep.memory.role == undefined)
             creep.memory.role = ROLE_STANDART;
         if(creep.memory.isWork == undefined)
@@ -60,7 +71,6 @@ var coreFrame =
     /** @param {Creep} creep **/
     ObtainWork : function (creep)
     {
-        creep.say("Думаю..");
         if(creep.carry.energy == 0)
             creep.memory.isWork = true;
         else if(creep.carry.energy == 50)
