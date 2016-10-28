@@ -1,16 +1,17 @@
 var core = require('core.framework');
 
-var roleUpgrader = {
-
+var roleEnergyProvider =
+{
     /** @param {Creep} creep **/
-    run: function(creep) {
+    run: function(creep)
+    {
         core.ObtainMemory(creep);
         core.ObtainWork(creep);
         if(!creep.memory.isWork)
-            core.SafeUpgradeController(creep, creep.room.controller);
+            core.SafeTransfer(creep, Game.spawns['s1']);
         else
             core.SafeHarvest(creep);
-	}
+    }
 };
 
-module.exports = roleUpgrader;
+module.exports = roleEnergyProvider;
