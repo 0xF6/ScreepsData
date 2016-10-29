@@ -21,10 +21,20 @@ var coreFrame =
     {
         var source = creep.pos.findClosestByPath(FIND_SOURCES);
 
-        if(creep.harvest(source) == ERR_NOT_IN_RANGE)
+        if(creep.memory.sourceIndex != undefined)
+        {
+            var sources = creep.room.find(FIND_SOURCES);
+            source = sources[creep.memory.sourceIndex];
+        }
+
+        var result = creep.harvest(source);
+        if(result == ERR_NOT_IN_RANGE)
             creep.moveTo(source);
-        else
+        else if(result == OK)
             creep.say("Добываю..");
+        else if(result == ERR_INVALID_TARGET)
+            creep.say("INVALID_TARGET");
+
     },
     /** @param {Creep|Spawn|Structure} target
      *  @param {Creep} creep
@@ -75,6 +85,14 @@ var coreFrame =
             creep.memory.isWork = true;
         else if(creep.carry.energy == 50)
             creep.memory.isWork = false;
+    },
+    /** @param {Creep} creep **/
+    ObtainIndex : function (creep)
+    {
+        if(creep.memory.sourceIndex != undefined) return;
+
+        var sources = Game.spawns['s1'].room.find(FIND_SOURCES);
+        creep.memory.sourceIndex = Math.floor(Math.random()*sources.length);
     }
 };
 
