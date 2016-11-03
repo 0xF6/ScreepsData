@@ -4,9 +4,11 @@ var roleBuilder = require('role.builder');
 var roleEnergyProvider = require('role.energyProvider');
 var roleRepair = require('role.repairer');
 
+var roleRtxUpdater = require('rtx.updater');
+var roleRtxProvider = require('rtx.provider');
+
 var core = require('core.framework');
 var spawnManager = require('core.spawn');
-
 
 module.exports.loop = function () 
 {
@@ -16,7 +18,8 @@ module.exports.loop = function ()
     //var result = Game.creeps['H-1'].claimController(ctrl[0]);
     //console.log(result);
     spawnManager.ManageSpawn();
-
+    core.Collect();
+    core.Safe(Game.spawns['s1'].room);
     for(var name in Game.creeps) 
     {
         var creep = Game.creeps[name];
@@ -28,9 +31,12 @@ module.exports.loop = function ()
         else if(creep.memory.role == 'builder')
             roleBuilder.run(creep);
         else if(creep.memory.role == 'provider')
-            roleEnergyProvider.run(creep);
+            if(creep.memory.isFiller)
+            roleRtxProvider.run(creep, true);
+            else
+            roleRtxProvider.run(creep, false);
         else if(creep.memory.role == 'updater')
-            roleUpgrader.run(creep);
+            roleRtxUpdater.run(creep);
         else
             core.ObtainMemory(creep);
     }
