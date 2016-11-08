@@ -2,12 +2,12 @@
  * @constant
  * @type {string}
  */
-const BUILDER = 1;
+const BUILDER = 5;
 /**
  * @constant
  * @type {string}
  */
-const REPAIRER = 1;
+const REPAIRER = 0;
 /**
  * @constant
  * @type {string}
@@ -86,10 +86,15 @@ var spawn =
         var cBuilder = _.sum(Game.creeps, (x)=> x.memory.role == 'builder');
         var cRepairer = _.sum(Game.creeps, (x)=> x.memory.role == 'repairer');
         var cUpgrader = _.sum(Game.creeps, (x)=> x.memory.role == 'updater');
-        var cProvider = _.sum(Game.creeps, (x)=> x.memory.role == 'provider' && x.memory.isFiller == false);
-        var cProviderFiller = _.sum(Game.creeps, (x)=> x.memory.role == 'provider' && x.memory.isFiller == true);
-        
-        
+        var cProvider = _.sum(Game.creeps, (x)=> x.memory.role == 'provider' && !x.memory.isFiller);
+        var cProviderFiller = _.sum(Game.creeps, (x)=> x.memory.role == 'provider' && x.memory.isFiller);
+
+        var cLinker_out = _.sum(Game.creeps, (x)=> x.memory.role == 'linker_out');
+        var cLinker_int = _.sum(Game.creeps, (x)=> x.memory.role == 'linker_in');
+
+        var cProviderTower = _.sum(Game.creeps, (x)=> x.memory.role == 'provider_tower');
+
+
         var body = [
             //TOUGH, TOUGH,   // 20
             //TOUGH, TOUGH,   // 20
@@ -99,23 +104,36 @@ var spawn =
             //WORK ,WORK,//WORK,// 300
             WORK ,WORK];    // 200
             // 700
-            
+        var linkerInBody = [MOVE, CARRY, WORK, WORK, WORK, WORK];
+        var linkerOutBody = [MOVE, CARRY, CARRY, CARRY, CARRY];
+
+        if(cLinker_int < 1)
+            if(Game.spawns['s1'].canCreateCreep(linkerInBody) == OK)
+                Game.spawns['s1'].createCreep(linkerInBody, 'LINKER-IN', {role: 'linker_in', isWork: false});
+        if(cLinker_out < 1)
+            if(Game.spawns['s1'].canCreateCreep(linkerOutBody) == OK)
+                Game.spawns['s1'].createCreep(linkerOutBody, 'LINKER-OUT', {role: 'linker_out', isWork: false});
+
             
         if(cProvider == 0)
         {
-            Game.spawns['s1'].createCreep([TOUGH, TOUGH, MOVE, CARRY, WORK], 'px-' + Game.spawns['s1'].memory.index.provider++, {role: 'provider', isWork: false});
+            Game.spawns['s1'].createCreep([MOVE, CARRY, WORK], 'px-' + Game.spawns['s1'].memory.index.provider++, {role: 'provider', isWork: false});
         }
         if(cRepairer == 0)
         {
-             Game.spawns['s1'].createCreep([TOUGH, TOUGH, MOVE, CARRY, WORK], 'rx-' + Game.spawns['s1'].memory.index.repairer++, {role: 'repairer', isWork: false});
+             Game.spawns['s1'].createCreep([MOVE, CARRY, WORK], 'rx-' + Game.spawns['s1'].memory.index.repairer++, {role: 'repairer', isWork: false});
         }
-        
+
+        if(cProviderTower < 1)
+            if(Game.spawns['s1'].canCreateCreep(body) == OK)
+                Game.spawns['s1'].createCreep(body, 'PT', {role: 'provider_tower', isWork: false, isFiller: false});
+
         if(cProvider < PROVIDER)
             if(Game.spawns['s1'].canCreateCreep(body) == OK)
-                Game.spawns['s1'].createCreep(body, 'PX-' + Game.spawns['s1'].memory.index.provider++, {role: 'provider', isWork: false});
+                Game.spawns['s1'].createCreep(body, 'PX-' + Game.spawns['s1'].memory.index.provider++, {role: 'provider', isWork: false, isFiller: false});
         if(cProviderFiller < PROVIDER_FILLER)
             if(Game.spawns['s1'].canCreateCreep(body) == OK)
-                Game.spawns['s1'].createCreep(body, 'PF-' + Game.spawns['s1'].memory.index.provider++, {role: 'provider', isWork: false});
+                Game.spawns['s1'].createCreep(body, 'PF-' + Game.spawns['s1'].memory.index.provider++, {role: 'provider', isWork: false, isFiller: true});
         if(cBuilder < BUILDER)
             if(Game.spawns['s1'].canCreateCreep(body) == OK)
                 Game.spawns['s1'].createCreep(body, 'BX-' + Game.spawns['s1'].memory.index.builder++, {role: 'builder', isWork: false});

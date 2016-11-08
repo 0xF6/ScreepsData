@@ -1,40 +1,39 @@
-var roleHarvester = require('role.harvester');
-var roleUpgrader = require('role.upgrader');
 var roleBuilder = require('role.builder');
-var roleEnergyProvider = require('role.energyProvider');
-var roleRepair = require('role.repairer');
 
 var roleRtxUpdater = require('rtx.updater');
 var roleRtxProvider = require('rtx.provider');
+var roleRtxRepairer = require('rtx.repairer');
+
+var rtxLinker = require('rtx.linker');
+var rtxPoller = require('rtx.poller');
 
 var core = require('core.framework');
 var spawnManager = require('core.spawn');
 
 module.exports.loop = function () 
 {
-    
-    //var ctrl = Game.creeps['H-1'].room.find(FIND_STRUCTURES, { filter: function(structure) { if(structure.structureType == STRUCTURE_CONTROLLER) { return true; }  return false; } } );
-    //Game.creeps['H-1'].moveTo(ctrl[0]);
-    //var result = Game.creeps['H-1'].claimController(ctrl[0]);
-    //console.log(result);
     spawnManager.ManageSpawn();
     core.Collect();
-    core.Safe(Game.spawns['s1'].room);
+    core.TowerUpdate();
     for(var name in Game.creeps) 
     {
         var creep = Game.creeps[name];
-
         core.ObtainIndex(creep);
-
+        rtxLinker.LinkUpdate();
         if(creep.memory.role == 'repairer')
-            roleRepair.run(creep);
+            roleRtxRepairer.run(creep);
         else if(creep.memory.role == 'builder')
             roleBuilder.run(creep);
+        else if(creep.memory.role == 'linker_in')
+            rtxLinker.ToLink(creep);
+        else if(creep.memory.role == 'linker_out')
+            rtxLinker.AtLinkToStorage(creep);
+        else if(creep.memory.role == 'poller')
+            rtxPoller.run(creep);
         else if(creep.memory.role == 'provider')
-            if(creep.memory.isFiller)
-            roleRtxProvider.run(creep, true);
-            else
-            roleRtxProvider.run(creep, false);
+            roleRtxProvider.run(creep, creep.memory.isFiller);
+        else if(creep.memory.role == 'provider_tower')
+            roleRtxProvider.runTower(creep);
         else if(creep.memory.role == 'updater')
             roleRtxUpdater.run(creep);
         else

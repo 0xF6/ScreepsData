@@ -15,6 +15,13 @@ var coreFrame =
                 x.structureType == STRUCTURE_STORAGE &&
                 x.energy != x.storeCapacity
             });
+        if(target == undefined)
+        {
+            console.log("KRITICAL ERROR - Storage is not found!");
+            this.SafeHarvest(creep);
+            return;
+        }
+            
         var result = target.transfer(creep, RESOURCE_ENERGY);
         if(result == ERR_NOT_IN_RANGE)
             this.SafeMove(creep, target);
@@ -39,6 +46,30 @@ var coreFrame =
             this.SafeMove(creep, target);
         else
             creep.say("Переношу..");
+    },
+    /** @param {Creep} creep
+     * @param {String} id **/
+    SafeHarvestByID : function (creep, id)
+    {
+        var source = Game.getObjectById(id);
+
+        var energy = creep.pos.findInRange(FIND_DROPPED_ENERGY, 1);
+        if (energy.length)
+        {
+            console.log('found ' + energy[0].energy + ' energy at ', energy[0].pos);
+            creep.pickup(energy[0]);
+            creep.say("Собираю..");
+            return;
+        }
+
+        var result = creep.harvest(source);
+        if(result == ERR_NOT_IN_RANGE)
+            this.SafeMove(creep, source);
+        else if(result == OK)
+            creep.say("Добываю..");
+        else if(result == ERR_INVALID_TARGET)
+            creep.say("INVALID_TARGET");
+
     },
     /** @param {Creep} creep **/
     SafeHarvest : function (creep)
@@ -111,6 +142,23 @@ var coreFrame =
         if(creep.memory.isFiller == undefined)
             creep.memory.isFiller = false;
     },
+    TowerUpdate : function ()
+    {
+        var tower = Game.getObjectById("581eb8acdb96d10803401ac7");
+        var targets = tower.pos.findClosestByPath(FIND_STRUCTURES,
+        {
+            filter: (x) => x.hits < x.hitsMax && x.structureType != STRUCTURE_WALL
+        });
+        var enemyCreeps = _.filter(Game.spawns['s1'].room.find(FIND_CREEPS), (creep) => !creep.my);
+
+        if(enemyCreeps.length != 0)
+        {
+            tower.attack(enemyCreeps[0]);
+            return;
+        }
+        if(targets != undefined || targets != null)
+        tower.repair(targets);
+    },
     /** @param {Creep} creep **/
     ObtainWork : function (creep)
     {
@@ -123,23 +171,7 @@ var coreFrame =
     ObtainIndex : function (creep)
     {
         if(creep.memory.sourceIndex != undefined) return;
-
-        var indexS = 0;
-
-        if(Game.spawns['s1'].memory.blockSource == undefined)
-            Game.spawns['s1'].memory.blockSource = true;
-        if(Game.spawns['s1'].memory.blockSource)
-        {
-            indexS = 1;
-            Game.spawns['s1'].memory.blockSource = false;
-        }
-        else
-        {
-            indexS = 0;
-            Game.spawns['s1'].memory.blockSource = true;
-        }
-
-        creep.memory.sourceIndex = indexS;
+        creep.memory.sourceIndex = 0;
     },
     /**
      * check for memory entries of died creeps by iterating over Memory.creeps
@@ -149,15 +181,6 @@ var coreFrame =
         for (let name in Memory.creeps)
         if (Game.creeps[name] == undefined)
         delete Memory.creeps[name];
-    },
-    /** @param {Room} room **/
-    Safe : function (room)
-    {
-        enemyCreeps = _.filter(room.find(FIND_CREEPS), (creep) => !creep.my);
-
-        // If more than one enemy creeps, activate safe mode
-        if (enemyCreeps.length > 2)
-            room.activateSafeMode();
     }
 };
 

@@ -17,6 +17,20 @@ var RtxEnergyProvider =
 
     },
     /** @param {Creep} creep **/
+    runTower : function (creep)
+    {
+        core.ObtainMemory(creep);
+        core.ObtainWork(creep);
+        var target = creep.pos.findClosestByPath(FIND_MY_STRUCTURES,
+            {
+                filter: (x) => x.structureType == STRUCTURE_TOWER && x.energy != 1000
+            });
+        if(target != null)
+            this.TransfAndFill(creep, target);
+        else
+            this.Fill(creep);
+    },
+    /** @param {Creep} creep **/
     Provide : function (creep)
     {
         var target = creep.pos.findClosestByPath(FIND_MY_STRUCTURES,
@@ -25,11 +39,10 @@ var RtxEnergyProvider =
                 x.structureType == STRUCTURE_EXTENSION && x.energy != 50 ||
                 x.structureType == STRUCTURE_SPAWN && x.energy != 300
             });
-
-        if(target == null)
-            this.TransfAndHarv(creep, target);
-        else
+        if(target != null)
             this.TransfAndFill(creep, target);
+        else
+            this.Fill(creep);
     },
     /** @param {Creep} creep **/
     Fill : function (creep)
