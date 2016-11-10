@@ -6,12 +6,14 @@ var roleRtxRepairer = require('rtx.repairer');
 
 var rtxLinker = require('rtx.linker');
 var rtxPoller = require('rtx.poller');
+var rtxClaimer = require('rtx.claimer');
 
 var core = require('core.framework');
 var spawnManager = require('core.spawn');
 
 module.exports.loop = function () 
 {
+    // Game.spawns['s1'].createCreep([MOVE, MOVE, MOVE, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK], "p-1", {role: "poller"})
     spawnManager.ManageSpawn();
     core.Collect();
     core.TowerUpdate();
@@ -24,6 +26,8 @@ module.exports.loop = function ()
             roleRtxRepairer.run(creep);
         else if(creep.memory.role == 'builder')
             roleBuilder.run(creep);
+        else if(creep.memory.role == 'claimer')
+            rtxClaimer.run(creep);
         else if(creep.memory.role == 'linker_in')
             rtxLinker.ToLink(creep);
         else if(creep.memory.role == 'linker_out')

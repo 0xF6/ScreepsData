@@ -17,7 +17,6 @@ var coreFrame =
             });
         if(target == undefined)
         {
-            console.log("KRITICAL ERROR - Storage is not found!");
             this.SafeHarvest(creep);
             return;
         }
@@ -127,6 +126,16 @@ var coreFrame =
         else
             creep.say("Чиню..");
     },
+    /** @param {Spawn|Structure} target
+     *  @param {Creep} creep
+     * **/
+    SafeMoveRoom : function (creep)
+    {
+        if(creep.room.name == "W32N55")
+            creep.moveTo(creep.pos.findClosestByPath(FIND_EXIT_BOTTOM));
+        else if(creep.room.name != "W32N54")
+            console.log("ERROR: SafeMoveRoom");
+    },
     /** @param {Creep} creep **/
     ObtainMemory : function(creep)
     {
@@ -141,23 +150,53 @@ var coreFrame =
         if(creep.memory.role == "provider")
         if(creep.memory.isFiller == undefined)
             creep.memory.isFiller = false;
+        if(creep.memory.RoomWork == undefined)
+            creep.memory.RoomWork = "W32N55";
     },
     TowerUpdate : function ()
     {
-        var tower = Game.getObjectById("581eb8acdb96d10803401ac7");
-        var targets = tower.pos.findClosestByPath(FIND_STRUCTURES,
+        var towers = [Game.getObjectById("58211384d5f995fb51705c3b"), Game.getObjectById("581eb8acdb96d10803401ac7")];
+        for(var i in towers)
         {
-            filter: (x) => x.hits < x.hitsMax && x.structureType != STRUCTURE_WALL
-        });
-        var enemyCreeps = _.filter(Game.spawns['s1'].room.find(FIND_CREEPS), (creep) => !creep.my);
+            var tower = towers[i];
+            var targets = tower.pos.findClosestByPath(FIND_STRUCTURES,
+                {
+                    filter: (x) =>
+                    x.hits < x.hitsMax && x.structureType != STRUCTURE_RAMPART && x.structureType != STRUCTURE_WALL
+                });
+            var enemyCreeps = _.filter(Game.spawns['s1'].room.find(FIND_CREEPS), (creep) => !creep.my);
 
-        if(enemyCreeps.length != 0)
-        {
-            tower.attack(enemyCreeps[0]);
-            return;
+            if(enemyCreeps.length != 0)
+            {
+                tower.attack(enemyCreeps[0]);
+                return;
+            }
+            if(targets != undefined || targets != null)
+                tower.repair(targets);
+            else
+            {
+                targets = tower.pos.findClosestByPath(FIND_STRUCTURES,
+                    {
+                        filter: (x) => x.structureType == STRUCTURE_RAMPART && x.hits <= (x.hitsMax / 100)
+                    });
+                if(targets != undefined || targets != null)
+                    tower.repair(targets);
+                else
+                {
+                    targets = tower.pos.findClosestByPath(FIND_STRUCTURES,
+                        {
+                            filter: (x) => x.structureType == STRUCTURE_WALL && x.hits <= (x.hitsMax / 6000)
+                        });
+                    if(targets != undefined || targets != null)
+                        tower.repair(targets);
+                    else
+                    {
+                        console.log("tower [" + tower + "] is not found work");
+                    }
+                }
+            }
         }
-        if(targets != undefined || targets != null)
-        tower.repair(targets);
+
     },
     /** @param {Creep} creep **/
     ObtainWork : function (creep)
