@@ -99,6 +99,9 @@ var spawn =
 
 
         var cUpgrader56 = _.sum(Game.creeps, (x)=> x.memory.role == 'updater' && x.memory.RoomWork == "W32N54");
+        var cBuilder54 = _.sum(Game.creeps, (x)=> x.memory.role == 'builder' && x.memory.RoomWork == "W32N54");
+
+        var cProvider56 = _.sum(Game.creeps, (x)=> x.memory.role == 'provider' && x.memory.RoomWork == "W32N56" && x.memory.isFiller);
 
 
 
@@ -147,11 +150,16 @@ var spawn =
             if(Game.spawns['s1'].canCreateCreep(body) == OK)
                 Game.spawns['s1'].createCreep(body, 'UX-' + Game.spawns['s1'].memory.index.updater++, {role: 'updater', isWork: false});
 
-        if(cUpgrader56 < 1)
+        if(cUpgrader56 < 2)
             if(Game.spawns['s1'].canCreateCreep(body) == OK)
-                Game.spawns['s1'].createCreep(body, 'U-54-' + Game.spawns['s1'].memory.index.updater++, {role: 'updater', isWork: false, RoomWork: "W32N54"});
+                Game.spawns['s1'].createCreep(body, 'U54-' + Game.spawns['s1'].memory.index.updater++, {role: 'updater', isWork: false, RoomWork: "W32N54"});
+        if(cBuilder54 < 2)
+            if(Game.spawns['s1'].canCreateCreep(body) == OK)
+                Game.spawns['s1'].createCreep(body, 'B54-' + Game.spawns['s1'].memory.index.builder++, {role: 'builder', isWork: false, RoomWork: "W32N54"});
 
-
+        if(cProvider56 < 2)
+            if(Game.spawns['s1'].canCreateCreep(body) == OK)
+                Game.spawns['s1'].createCreep(body, 'F56-' + Game.spawns['s1'].memory.index.provider++, {role: 'provider', isWork: false, isFiller: true, RoomWork: "W32N56"});
         /*for(var r in this.getRoles())
         if(_.sum(Game.creeps, (x)=> x.memory.role == r) == 0)
         this.CreateCustomCreeep(r, true);
