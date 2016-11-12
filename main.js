@@ -1,5 +1,5 @@
 var roleBuilder = require('role.builder');
-
+var roleRepairer = require('role.repairer');
 var roleRtxUpdater = require('rtx.updater');
 var roleRtxProvider = require('rtx.provider');
 var roleRtxRepairer = require('rtx.repairer');
@@ -32,6 +32,8 @@ module.exports.loop = function ()
                 FrameCreep.UpDater(creep);
             else if(creep.memory.role == "provider")
                 FrameCreep.Provider(creep);
+            else if(creep.memory.role == "repairer")
+                roleRepairer.run(creep);
             else
                 core.ObtainMemory(creep);
         }

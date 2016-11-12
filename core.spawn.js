@@ -2,7 +2,7 @@
  * @constant
  * @type {string}
  */
-const BUILDER = 5;
+const BUILDER = 1;
 /**
  * @constant
  * @type {string}
@@ -12,7 +12,7 @@ const REPAIRER = 0;
  * @constant
  * @type {string}
  */
-const UPGRADER = 1;
+const UPGRADER = 6;
 /**
  * @constant
  * @type {string}
@@ -103,7 +103,7 @@ var spawn =
 
         var cProvider56 = _.sum(Game.creeps, (x)=> x.memory.role == 'provider' && x.memory.RoomWork == "W32N56" && x.memory.isFiller);
 
-
+        var cRepairer54 = _.sum(Game.creeps, (x)=> x.memory.role == 'repairer' && x.memory.RoomWork == "W32N54");
 
         var body = [
             //TOUGH, TOUGH,   // 20
@@ -127,6 +127,10 @@ var spawn =
             if(Game.spawns['s1'].canCreateCreep(linkerOutBody) == OK)
                 Game.spawns['s1'].createCreep(linkerOutBody, 'LINKER-OUT', {role: 'linker_out', isWork: false});
 
+
+        if(cRepairer54 < 1)
+            if(Game.spawns['s2'].canCreateCreep([CARRY, WORK, MOVE]) == OK)
+                Game.spawns['s2'].createCreep([CARRY, WORK, MOVE], 'RX-' + Game.spawns['s1'].memory.index.repairer++, {role: 'repairer', isWork: false, RoomWork: "W32N54"});
             
         if(cProvider == 0) Game.spawns['s1'].createCreep([MOVE, CARRY, WORK], 'px-' + Game.spawns['s1'].memory.index.provider++, {role: 'provider', isWork: false});
 
@@ -150,7 +154,7 @@ var spawn =
             if(Game.spawns['s1'].canCreateCreep(body) == OK)
                 Game.spawns['s1'].createCreep(body, 'UX-' + Game.spawns['s1'].memory.index.updater++, {role: 'updater', isWork: false});
 
-        if(cUpgrader56 < 2)
+        if(cUpgrader56 < 6)
             if(Game.spawns['s1'].canCreateCreep(body) == OK)
                 Game.spawns['s1'].createCreep(body, 'U54-' + Game.spawns['s1'].memory.index.updater++, {role: 'updater', isWork: false, RoomWork: "W32N54"});
         if(cBuilder54 < 2)

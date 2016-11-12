@@ -79,7 +79,17 @@ var coreCreeps =
                 if(!creep.memory.isWork)
                 {
                     if(creep.room.name == "W32N56")
-                    creep.moveTo(creep.pos.findClosestByPath(FIND_EXIT_BOTTOM));
+                    {
+                        var c = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
+
+                        if(c)
+                        {
+                            core.SafeBuild(creep, c);
+                            return;
+                        }
+
+                        creep.moveTo(creep.pos.findClosestByPath(FIND_EXIT_BOTTOM));
+                    }
                 }
                 else
                     core.SafeHarvestByID(creep, "579fa9100700be0674d2ebc4");
