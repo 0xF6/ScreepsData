@@ -1,9 +1,14 @@
 import { XObject } from "./XObject";
 import { MathUtil } from "./MathUtil";
+import { STATUS_CODE } from "./StatusCode";
 
 
 export class XCreep extends XObject
 {
+    public static UPDATER = "updater";
+    public static PROVIDER = "provider";
+    public static BUILDER = "builder";
+
     public Creep : Creep;
 
     constructor(creep : Creep)
@@ -54,14 +59,17 @@ export class XCreep extends XObject
 
         switch(this.getRole)
         {
-            case "updater":
+            case XCreep.UPDATER:
                 this.UpgradeController();
                 break;
-            case "provider":
+            case XCreep.PROVIDER:
                 this.Provide();
                 break;
-            case "builder":
+            case XCreep.BUILDER:
                 this.Build();
+                break;
+            default:
+                this.UpgradeController();
                 break;
         }
     }
@@ -94,7 +102,7 @@ export class XCreep extends XObject
                 this.Harvest();
         }
     }
-    public Move(target: Structure | Source | ConstructionSite): void
+    public Move(target: Structure | Source | ConstructionSite | Resource): void
     {
         if(this.Creep.moveTo(target, {visualizePathStyle: this.getVisualStyle() }) == ERR_INVALID_TARGET)
         {
@@ -111,11 +119,26 @@ export class XCreep extends XObject
         {
             if(!this.Creep.memory.isWork)
             {
+                let breakedStrcuture = this.Creep.pos.findClosestByPath(FIND_STRUCTURES,
+                {
+                    filter: (x) => x.hits < x.hitsMax && x.structureType != STRUCTURE_WALL
+                });
+
+                if(breakedStrcuture)
+                {
+                    let result = this.Creep.repair(breakedStrcuture[0]);
+                    if(result == ERR_NOT_IN_RANGE)
+                        this.Move(target);
+                    else if(result == OK) {}
+                    else console.log(`[repair] found ${this} creep status at ${STATUS_CODE[result]}`);
+                    return;
+                }
+
                 let result = this.Creep.build(target);
                 if(result == ERR_NOT_IN_RANGE)
                     this.Move(target);
                 else if(result == OK) {}
-                else console.error(`found ${this} creep status at ${result}`);
+                else console.log(`[Build] found ${this} creep status at ${STATUS_CODE[result]}`);
             }
             else this.Harvest();
 
@@ -126,18 +149,28 @@ export class XCreep extends XObject
     {
         let target = this.Creep.room.controller;
         let result = this.Creep.upgradeController(target);
+
+        if(this.Creep.memory.isWork)
+        {
+            this.Harvest();
+            return;
+        }
+
         if(result == ERR_NOT_IN_RANGE)
             this.Move(target);
+        else if(result == OK) { }
         else
-            console.error(`found ${this} creep status at ${result}`);
+            console.log(`[Upd] found ${this} creep status at ${STATUS_CODE[result]}`);
     }
     public Harvest(): void
     {
-        let energy: Array<Resource> = this.Creep.pos.findInRange(FIND_DROPPED_RESOURCES, 1);
+        let energy: Array<Resource> = this.Creep.pos.findInRange(FIND_DROPPED_RESOURCES, 5);
         if (energy.length)
         {
-            console.log(`found ${energy[0].amount} energy at ${energy[0].pos}`);
-            this.Creep.pickup(energy[0]);
+            let res = this.Creep.pickup(energy[0]);
+            if(res == ERR_NOT_IN_RANGE)
+                res = this.Move(energy[0]);
+            console.log(`[${STATUS_CODE[res]}] found ${energy[0].amount} energy at ${energy[0].pos}`);
             return;
         }
 
@@ -156,23 +189,26 @@ export class XCreep extends XObject
 
 
 
-        let result = this.Creep.harvest(source);
+        let result: STATUS_CODE = this.Creep.harvest(source);
         if(result == ERR_NOT_IN_RANGE)
             this.Move(source);
         else if(result == OK) { }
         else
-            console.error(`found ${this} creep status at ${result}`);
+            console.log(`[Harv] found ${this} creep status at ${STATUS_CODE[result]}`);
     }
-
+    public toString(): string
+    {
+        return `(${this.getRole})[${this.getID().ToString()}]`;
+    }
 
     public getVisualStyle(): object
     {
         return {
             fill: 'transparent',
-            stroke: '#fff',
+            stroke: '#ecebff',
             lineStyle: 'dashed',
             strokeWidth: .15,
-            opacity: .1
+            opacity: .4
         };
     }
 }
