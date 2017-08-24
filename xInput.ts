@@ -1,6 +1,7 @@
 import { Guid } from "./Guid";
 import { SpawnManager } from "./SpawnManger";
 import { XCreep } from "./XCreep";
+import { XTower } from "./XTower";
 
 export class xInput
 {
@@ -18,6 +19,13 @@ export class xInput
             let creep = Game.creeps[name];
             let xcreep = new XCreep(creep);
             xcreep.Work();
+        }
+        for(let x in Game.structures)
+        {
+            let str = Game.structures[x];
+            if(str.structureType != "tower") continue;
+            let tow = new XTower(<Tower>str);
+            tow.Work();
         }
     }
 }

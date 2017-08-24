@@ -90,16 +90,31 @@ export class XCreep extends XObject
         }
         else
         {
-            let targetStorage = this.Creep.pos.findClosestByPath(FIND_MY_STRUCTURES,
-                {
-                    filter: (x) =>
-                    x.structureType == STRUCTURE_STORAGE &&
-                    x.energy != x.storeCapacity
-                });
-            if(!this.Creep.memory.isWork)
-                this.Transfer(targetStorage);
+            let target = this.Creep.pos.findClosestByPath(FIND_MY_STRUCTURES,
+            {
+                filter: (x) =>
+                x.structureType == STRUCTURE_TOWER && x.energy != 1000
+            });
+            if(target != null)
+            {
+                if(!this.Creep.memory.isWork)
+                    this.Transfer(target);
+                else
+                    this.Fill();
+            }
             else
-                this.Harvest();
+            {
+                let targetStorage = this.Creep.pos.findClosestByPath(FIND_MY_STRUCTURES,
+                    {
+                        filter: (x) =>
+                        x.structureType == STRUCTURE_STORAGE &&
+                        x.energy != x.storeCapacity
+                    });
+                if(!this.Creep.memory.isWork)
+                    this.Transfer(targetStorage);
+                else
+                    this.Harvest();
+            }
         }
     }
     public Move(target: Structure | Source | ConstructionSite | Resource): void
@@ -110,8 +125,36 @@ export class XCreep extends XObject
             console.log(`found ${this} creep status at ERR_INVALID_TARGET`);
         }
     }
+    public AutoRepair() : bool
+    {
+        let breakedStrcuture : Structure = this.Creep.pos.findClosestByPath(FIND_STRUCTURES,
+            {
+                filter: (x) => x.hits < x.hitsMax && x.structureType != STRUCTURE_WALL && x.structureType != STRUCTURE_RAMPART
+            });
+
+        if(breakedStrcuture != undefined)
+        {
+            if(!this.Creep.memory.isWork)
+            {
+                let result = this.Creep.repair(breakedStrcuture);
+                if(result == ERR_NOT_IN_RANGE)
+                    this.Move(breakedStrcuture);
+                else if(result == OK) {}
+                else console.log(`[repair] found ${this} creep status at ${STATUS_CODE[result]}`);
+                return true;
+            }
+            else
+            {
+                this.Harvest();
+                return true;
+            }
+        }
+        return false;
+    }
     public Build()
     {
+        if(this.AutoRepair()) return;
+
         let target : ConstructionSite = this.Creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
 
 
@@ -119,21 +162,6 @@ export class XCreep extends XObject
         {
             if(!this.Creep.memory.isWork)
             {
-                let breakedStrcuture = this.Creep.pos.findClosestByPath(FIND_STRUCTURES,
-                {
-                    filter: (x) => x.hits < x.hitsMax && x.structureType != STRUCTURE_WALL
-                });
-
-                if(breakedStrcuture)
-                {
-                    let result = this.Creep.repair(breakedStrcuture[0]);
-                    if(result == ERR_NOT_IN_RANGE)
-                        this.Move(target);
-                    else if(result == OK) {}
-                    else console.log(`[repair] found ${this} creep status at ${STATUS_CODE[result]}`);
-                    return;
-                }
-
                 let result = this.Creep.build(target);
                 if(result == ERR_NOT_IN_RANGE)
                     this.Move(target);
@@ -162,6 +190,12 @@ export class XCreep extends XObject
         else
             console.log(`[Upd] found ${this} creep status at ${STATUS_CODE[result]}`);
     }
+
+    public MoveToRoom(roomPos: RoomPosition): void
+    {
+
+    }
+
     public Harvest(): void
     {
         let energy: Array<Resource> = this.Creep.pos.findInRange(FIND_DROPPED_RESOURCES, 5);
@@ -169,7 +203,10 @@ export class XCreep extends XObject
         {
             let res = this.Creep.pickup(energy[0]);
             if(res == ERR_NOT_IN_RANGE)
-                res = this.Move(energy[0]);
+            {
+                this.Move(energy[0]);
+                res = OK;
+            }
             console.log(`[${STATUS_CODE[res]}] found ${energy[0].amount} energy at ${energy[0].pos}`);
             return;
         }
@@ -193,12 +230,13 @@ export class XCreep extends XObject
         if(result == ERR_NOT_IN_RANGE)
             this.Move(source);
         else if(result == OK) { }
+        else if(result == ERR_BUSY) { this.Creep.say("Not Aviable"); }
         else
             console.log(`[Harv] found ${this} creep status at ${STATUS_CODE[result]}`);
     }
     public toString(): string
     {
-        return `(${this.getRole})[${this.getID().ToString()}]`;
+        return `(${this.getRole})[${this.getID().ToString().split('-')[0]}]`;
     }
 
     public getVisualStyle(): object

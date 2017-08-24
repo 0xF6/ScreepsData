@@ -10,7 +10,13 @@ export class SpawnManager
         let updaters = _.sum(Game.creeps, (x) => x.memory.Role == XCreep.UPDATER);
 
         let body = [MOVE, CARRY, WORK, CARRY, CARRY];
-        if(providers < 2)
+
+        if(providers > 1 && ((providers + builders + updaters) > 5))
+        {
+            body = [MOVE, CARRY, WORK, CARRY, CARRY, CARRY, WORK, WORK];
+        }
+
+        if(providers < 3)
         {
             if(Game.spawns['Spawn'].canCreateCreep(body) == OK)
             {
@@ -21,7 +27,7 @@ export class SpawnManager
             }
             return;
         }
-        if(builders < 3)
+        if(builders < 4)
         {
             if(Game.spawns['Spawn'].canCreateCreep(body) == OK)
             {
