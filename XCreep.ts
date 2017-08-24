@@ -79,7 +79,8 @@ export class XCreep extends XObject
             {
                 filter: (x) =>
                 x.structureType == STRUCTURE_EXTENSION && x.energy != 50 ||
-                x.structureType == STRUCTURE_SPAWN && x.energy != 300
+                x.structureType == STRUCTURE_SPAWN && x.energy != 300 ||
+                x.structureType == STRUCTURE_TOWER && x.energy != 1000
             });
         if(target != null)
         {
@@ -90,31 +91,16 @@ export class XCreep extends XObject
         }
         else
         {
-            let target = this.Creep.pos.findClosestByPath(FIND_MY_STRUCTURES,
-            {
-                filter: (x) =>
-                x.structureType == STRUCTURE_TOWER && x.energy != 1000
-            });
-            if(target != null)
-            {
-                if(!this.Creep.memory.isWork)
-                    this.Transfer(target);
-                else
-                    this.Fill();
-            }
+            let targetStorage = this.Creep.pos.findClosestByPath(FIND_MY_STRUCTURES,
+                {
+                    filter: (x) =>
+                    x.structureType == STRUCTURE_STORAGE &&
+                    x.energy != x.storeCapacity
+                });
+            if(!this.Creep.memory.isWork)
+                this.Transfer(targetStorage);
             else
-            {
-                let targetStorage = this.Creep.pos.findClosestByPath(FIND_MY_STRUCTURES,
-                    {
-                        filter: (x) =>
-                        x.structureType == STRUCTURE_STORAGE &&
-                        x.energy != x.storeCapacity
-                    });
-                if(!this.Creep.memory.isWork)
-                    this.Transfer(targetStorage);
-                else
-                    this.Harvest();
-            }
+                this.Harvest();
         }
     }
     public Move(target: Structure | Source | ConstructionSite | Resource): void

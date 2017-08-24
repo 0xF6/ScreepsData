@@ -11,7 +11,7 @@ export class SpawnManager
 
         let body = [MOVE, CARRY, WORK, CARRY, CARRY];
 
-        if(providers > 1 && ((providers + builders + updaters) > 5))
+        if(providers > 1 && ((providers + builders + updaters) > 4))
         {
             body = [MOVE, CARRY, WORK, CARRY, CARRY, CARRY, WORK, WORK];
         }
@@ -27,7 +27,7 @@ export class SpawnManager
             }
             return;
         }
-        if(builders < 4)
+        if(builders < 5)
         {
             if(Game.spawns['Spawn'].canCreateCreep(body) == OK)
             {
