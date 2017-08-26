@@ -132,39 +132,37 @@ Room.prototype.handleTower = function() {
   let repair_min = this.memory.repair_min;
   let repairable_blockers = object => object.hits < Math.min(repair_min, object.hitsMax);
 
-  for (let tower of towers) {
-    if (tower.energy === 0) {
-      continue;
-    }
-    if (!this.exectueEveryTicks(10)) {
-      if (tower.energy < tower.energyCapacity / 2 || this.memory.repair_min > 1000000) {
-        continue;
-      }
-    }
 
-    const low_rampart = tower.pos.findClosestByRangePropertyFilter(FIND_STRUCTURES, 'structureType', [STRUCTURE_RAMPART], false, {
-      filter: rampart => rampart.hits < 10000
-    });
+  for (let tower of towers)
+  {
+      if (tower.energy === 0)
+          continue;
+      if (!this.exectueEveryTicks(10))
+          if (tower.energy < tower.energyCapacity / 2 || this.memory.repair_min > 1000000)
+              continue;
 
-    let repair = low_rampart;
-    if (low_rampart === null) {
-      let to_repair = tower.pos.findClosestByRangePropertyFilter(FIND_STRUCTURES, 'structureType', [
-        STRUCTURE_WALL, STRUCTURE_RAMPART,
-        // TODO Let see if the creeps can keep the roads alive
-        STRUCTURE_ROAD
-      ], true, { filter: repairable_structures });
-      // if (to_repair === null) {
-      //   to_repair = tower.pos.findClosestByRangePropertyFilter(FIND_STRUCTURES, 'structureType', [STRUCTURE_WALL, STRUCTURE_RAMPART], false, {
-      //     filter: repairable_blockers
-      //   });
-      // }
-      // if (to_repair === null) {
-      //   this.memory.repair_min += 10000;
-      //   this.log('Defense level: ' + this.memory.repair_min);
-      //   continue;
-      // }
-      repair = to_repair;
-      tower.repair(repair);
+      const low_rampart = tower.pos.findClosestByRangePropertyFilter(FIND_STRUCTURES, 'structureType', [STRUCTURE_RAMPART], false, {
+        filter: rampart => rampart.hits < 10000
+      });
+
+      let repair = low_rampart;
+      if (low_rampart === null)
+      {
+        let to_repair = tower.pos.findClosestByRangePropertyFilter(FIND_STRUCTURES, 'structureType', [
+          STRUCTURE_WALL, STRUCTURE_RAMPART,
+          // TODO Let see if the creeps can keep the roads alive
+          STRUCTURE_ROAD
+        ], true, { filter: repairable_structures });
+       if (to_repair === null)
+       {
+           to_repair = tower.pos.findClosestByPath(FIND_STRUCTURES, {
+               filter: function (x) {
+                   return x.hits < x.hitsMax && x.structureType != STRUCTURE_RAMPART && x.structureType != STRUCTURE_WALL;
+               }
+           });
+       }
+       repair = to_repair;
+       tower.repair(repair);
     }
   }
   return true;

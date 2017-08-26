@@ -20,7 +20,7 @@ roles.autoattackmelee.died = function(name, memory) {
 };
 
 roles.autoattackmelee.preMove = function(creep) {
-  //  creep.log('!!!!!!!!!!!!!!!! Autoattacking');
+  creep.log('!!!!!!!!!!!!!!!! Autoattacking');
 };
 
 roles.autoattackmelee.action = function(creep) {
@@ -42,18 +42,17 @@ roles.autoattackmelee.action = function(creep) {
   }
 
   const spawn = creep.pos.findClosestByRangePropertyFilter(FIND_HOSTILE_STRUCTURES, 'structureType', [STRUCTURE_SPAWN]);
-
   if (spawn === null) {
     const hostileCreep = creep.findClosestEnemy();
+
     if (hostileCreep === null) {
       const structures = creep.pos.findClosestByRangePropertyFilter(FIND_HOSTILE_STRUCTURES, 'structureType', [STRUCTURE_CONTROLLER], true);
-
       if (structures === null) {
         const constructionSites = creep.pos.findClosestByRange(FIND_CONSTRUCTION_SITES);
         creep.moveTo(constructionSites);
+          creep.attack(constructionSites);
         return true;
       }
-
       creep.moveTo(structures);
       creep.attack(structures);
       return true;

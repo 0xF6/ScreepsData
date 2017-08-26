@@ -195,7 +195,8 @@ Room.prototype.getPartsStringDatas = function(parts, energyAvailable) {
  */
 Room.prototype.getSettings = function(creep) {
   let role = creep.role;
-  console.log(role);
+    if (config.debug.spawn)
+        console.log(role);
   let updateSettings = roles[role].updateSettings && roles[role].updateSettings(this, creep);
   let settings = _.merge(roles[role].settings, updateSettings);
   if (!settings) {
@@ -354,7 +355,8 @@ Room.prototype.getCreepConfig = function(creep) {
   var id = Math.floor((Math.random() * 10000) + 1);
   var name = role + '-' + id;
   var partConfig = this.getPartConfig(creep);
-  console.log(partConfig);
+    if (config.debug.spawn)
+      console.log(partConfig);
   if (!partConfig) { return; }
   let memory = Object.assign({}, creep, {
     number: id,
@@ -383,8 +385,10 @@ Room.prototype.spawnCreateCreep = function(creep) {
 
   let creepConfig = this.getCreepConfig(creep);
 
-  if (!creepConfig) {
-    console.log("warn: creepConfig is undefined");
+  if (!creepConfig)
+  {
+      if (config.debug.spawn)
+      console.log("warn: creepConfig is undefined");
     return false;
   }
 

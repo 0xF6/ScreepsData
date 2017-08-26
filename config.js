@@ -55,9 +55,9 @@ global.config = {
   },
 
   debug: {
-    getPartsConfLogs: true,
-    queue: true,
-    spawn: true
+    getPartsConfLogs: false,
+    queue: false,
+    spawn: false
   },
 
   tower: {

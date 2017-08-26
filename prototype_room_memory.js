@@ -59,6 +59,7 @@ Room.prototype.getMemoryCostMatrix = function() {
     if (!this.memory.costMatrix || !this.memory.costMatrix.base) {
       return;
     }
+    if(PathFinder.CostMatrix.deserialize)
     cache.rooms[this.name].costMatrix.base = PathFinder.CostMatrix.deserialize(this.memory.costMatrix.base);
   }
   return cache.rooms[this.name].costMatrix.base;
