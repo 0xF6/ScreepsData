@@ -31,7 +31,10 @@ var main = function() {
     console.log('Skipping tick ' + Game.time + ' due to lack of CPU.');
     return;
   }
-
+  if(false)
+  {
+      //Game.rooms.E48S9.memory.queue.push({role: 'reserver', routing: {targetRoom: 'E48S8', targetId: '5873bc0e11e3e4361b4d6fc3'}})
+  }
   brain.prepareMemory();
   brain.handleNextroom();
   brain.handleSquadmanager();

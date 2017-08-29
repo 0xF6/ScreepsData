@@ -106,9 +106,10 @@ if (config.visualizer.enabled) {
                 this.drawPosition(rv, creeps[positionName], text, 'yellow');
               } else {
                 let text = positionName.substr(0, 1);
-                for (let towerfiller of creeps[positionName]) {
+                if(creeps != undefined)
+               try { for (let towerfiller of creeps[positionName]) {
                   this.drawPosition(rv, towerfiller, text, 'yellow');
-                }
+                }} catch(e){}
               }
             }
           }

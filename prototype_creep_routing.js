@@ -178,8 +178,6 @@ Creep.prototype.moveByPathMy = function(route, routePos, start, target, skipPreM
     // this.room.name + ' ' + this.memory.base + ' ' +
     // this.memory.routing.targetRoom + ' routePos: ' + routePos + ' route: ' +
     // JSON.stringify(route));
-    this.say('R:no path');
-    this.log('R:no path');
     // this.log('R:no path: pathStart-' + this.memory.routing.targetId);
     if (!skipPreMove) {
       if (unit.preMove) {

@@ -43,7 +43,7 @@ global.config = {
   // Due to newly introduces via global variable caching this can be removed
   performance: {
     serializePath: true,
-    costMatrixMemoryMaxGCL: 55
+    costMatrixMemoryMaxGCL: 25
   },
 
   // use username `tooangels` and password `tooSecretPassword` at https://screepspl.us/grafana
@@ -107,12 +107,12 @@ global.config = {
 
   buildRoad: {
     maxConstructionSitesTotal: 80,
-    maxConstructionSitesRoom: 10,
+    maxConstructionSitesRoom: 20,
     buildToOtherMyRoom: true
   },
 
   constructionSite: {
-    maxIdleTime: 5000
+    maxIdleTime: 3000
   },
 
   hostile: {
@@ -191,12 +191,12 @@ global.config = {
     borderAvoid: 20,
     skLairAvoidRadius: 5,
     skLairAvoid: 30,
-    wallAvoid: 10,
+    wallAvoid: 8,
     sourceAvoid: 20,
-    pathAvoid: 1,
+    pathAvoid: 2,
     structureAvoid: 0xFF,
     creepAvoid: 0xFF,
-    wallThickness: 1,
+    wallThickness: 2,
     version: 19,
   },
 
@@ -212,7 +212,7 @@ global.config = {
   },
 
   market: {
-    minAmount: 100,
+    minAmount: 10000,
     energyCreditEquivalent: 1,
     trySellOrders: true,
     sellOrderMaxAmount: 100,
@@ -222,11 +222,11 @@ global.config = {
 
   priorityQueue: {
     sameRoom: {
-      harvester: 1,
-      sourcer: 2,
-      storagefiller: 3,
-      defendranged: 4,
-      carry: 5
+      harvester:2,
+      sourcer: 3,
+      storagefiller: 4,
+      defendranged: 5,
+      carry: 6
     },
     otherRoom: {
       harvester: 11,
@@ -235,7 +235,7 @@ global.config = {
       nextroomer: 15,
       carry: 17,
       sourcer: 18,
-      reserver: 19
+      reserver: 1
     }
   }
 };

@@ -10,11 +10,11 @@
 roles.reserver = {};
 roles.reserver.killPrevious = true;
 // TODO should be true, but flee must be fixed  (2016-10-13)
-roles.reserver.flee = false;
+roles.reserver.flee = true;
 
 roles.reserver.settings = {
   layoutString: 'MK',
-  maxLayoutAmount: 1
+  maxLayoutAmount: 2
 };
 roles.reserver.updateSettings = function(room, creep) {
   let level = creep.level ? creep.level : 1;
@@ -29,6 +29,9 @@ roles.reserver.updateSettings = function(room, creep) {
       amount: [5, 5]
     };
   }
+  return {
+      amount: [2, 2]
+  };
 };
 
 roles.reserver.action = function(creep) {

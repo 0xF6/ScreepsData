@@ -51,6 +51,7 @@ Room.prototype.destroyStructure = function(structure) {
       }
     }
     this.log('destroyStructure: not found in paths, destroying: ' + structure.structureType + ' ' + JSON.stringify(structure.pos) + ' ' + JSON.stringify(Object.keys(this.getMemoryPaths())));
+    if(structure.structureType !== STRUCTURE_ROAD)
     structure.destroy();
     return true;
   }
@@ -69,7 +70,8 @@ Room.prototype.destroyStructure = function(structure) {
 
   if (structures.length > structuresMin && (structure.my || Room.structureIsEmpty(structure))) {
     this.log('Destroying: ' + structure.structureType + ' ' + JSON.stringify(structure.pos));
-    structure.destroy();
+      if(structure.structureType !== STRUCTURE_ROAD)
+          structure.destroy();
     return true;
   }
   this.log('Not destroying: ' + structure.structureType + ' ' + JSON.stringify(structure.pos) + ' ' + structures.length + ' ' + structuresMin);
@@ -82,7 +84,7 @@ Room.prototype.destroyStructure = function(structure) {
           this.log('-----------------------------------------');
           this.log('ATTENTION: The last spawn is destroyed, a new one will be build automatically, DO NOT RESPAWN');
           this.log('-----------------------------------------');
-          structure.destroy();
+          //structure.destroy();
           delete this.memory.misplacedSpawn;
           this.memory.controllerLevel.checkWrongStructureInterval = 1;
           delete this.memory.walls;
