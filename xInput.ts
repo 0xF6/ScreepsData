@@ -2,7 +2,7 @@ import { Guid } from "./Guid";
 import { SpawnManager } from "./SpawnManger";
 import { XCreep } from "./XCreep";
 import { XTower } from "./XTower";
-
+/// <reference path="./ts/node_modules/@types/underscore/index.d.ts" />
 export class xInput
 {
     public static Main(): void

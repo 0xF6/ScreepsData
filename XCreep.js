@@ -183,7 +183,12 @@ var XCreep = (function (_super) {
         var result = this.Creep.harvest(source);
         if (result == ERR_NOT_IN_RANGE)
             this.Move(source);
-        else if (result == OK) { }
+        else if (result == OK) {
+            if (this.getRole == XCreep.BUILDER) {
+                var target = this.Creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
+                var res = this.Creep.build(target);
+            }
+        }
         else if (result == ERR_BUSY) {
             this.Creep.say("Not Aviable");
         }

@@ -14,8 +14,8 @@ var SpawnManager = (function () {
             body = [MOVE, CARRY, WORK, CARRY, CARRY, CARRY, WORK, WORK];
         }
         if (providers < 3) {
-            if (Game.spawns['Spawn'].canCreateCreep(body) == OK) {
-                Game.spawns['Spawn'].createCreep(body, Guid_1.Guid.newGuid()
+            if (Game.spawns['Spawn1'].canCreateCreep(body) == OK) {
+                Game.spawns['Spawn1'].createCreep(body, Guid_1.Guid.newGuid()
                     .ToString()
                     .split('-')[0], { Role: XCreep_1.XCreep.PROVIDER });
                 return;
@@ -23,15 +23,15 @@ var SpawnManager = (function () {
             return;
         }
         if (builders < 5) {
-            if (Game.spawns['Spawn'].canCreateCreep(body) == OK) {
-                Game.spawns['Spawn'].createCreep(body, Guid_1.Guid.newGuid().ToString().split('-')[0], { Role: XCreep_1.XCreep.BUILDER });
+            if (Game.spawns['Spawn1'].canCreateCreep(body) == OK) {
+                Game.spawns['Spawn1'].createCreep(body, Guid_1.Guid.newGuid().ToString().split('-')[0], { Role: XCreep_1.XCreep.BUILDER });
                 return;
             }
             return;
         }
         if (updaters < 2) {
-            if (Game.spawns['Spawn'].canCreateCreep(body) == OK) {
-                Game.spawns['Spawn'].createCreep(body, Guid_1.Guid.newGuid().ToString().split('-')[0], { Role: XCreep_1.XCreep.UPDATER });
+            if (Game.spawns['Spawn1'].canCreateCreep(body) == OK) {
+                Game.spawns['Spawn1'].createCreep(body, Guid_1.Guid.newGuid().ToString().split('-')[0], { Role: XCreep_1.XCreep.UPDATER });
                 return;
             }
             return;

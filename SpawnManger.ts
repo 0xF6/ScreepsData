@@ -18,9 +18,9 @@ export class SpawnManager
 
         if(providers < 3)
         {
-            if(Game.spawns['Spawn'].canCreateCreep(body) == OK)
+            if(Game.spawns['Spawn1'].canCreateCreep(body) == OK)
             {
-                Game.spawns['Spawn'].createCreep(body, Guid.newGuid()
+                Game.spawns['Spawn1'].createCreep(body, Guid.newGuid()
                     .ToString()
                     .split('-')[0], { Role: XCreep.PROVIDER });
                 return;
@@ -29,18 +29,18 @@ export class SpawnManager
         }
         if(builders < 5)
         {
-            if(Game.spawns['Spawn'].canCreateCreep(body) == OK)
+            if(Game.spawns['Spawn1'].canCreateCreep(body) == OK)
             {
-                Game.spawns['Spawn'].createCreep(body, Guid.newGuid().ToString().split('-')[0],{Role: XCreep.BUILDER});
+                Game.spawns['Spawn1'].createCreep(body, Guid.newGuid().ToString().split('-')[0],{Role: XCreep.BUILDER});
                 return;
             }
             return;
         }
         if(updaters < 2)
         {
-            if(Game.spawns['Spawn'].canCreateCreep(body) == OK)
+            if(Game.spawns['Spawn1'].canCreateCreep(body) == OK)
             {
-                Game.spawns['Spawn'].createCreep(body, Guid.newGuid().ToString().split('-')[0],{Role: XCreep.UPDATER});
+                Game.spawns['Spawn1'].createCreep(body, Guid.newGuid().ToString().split('-')[0],{Role: XCreep.UPDATER});
                 return;
             }
             return;

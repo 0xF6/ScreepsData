@@ -215,7 +215,14 @@ export class XCreep extends XObject
         let result: STATUS_CODE = this.Creep.harvest(source);
         if(result == ERR_NOT_IN_RANGE)
             this.Move(source);
-        else if(result == OK) { }
+        else if(result == OK)
+        {
+            if(this.getRole == XCreep.BUILDER)
+            {
+                let target : ConstructionSite = this.Creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
+                const res = this.Creep.build(target);
+            }
+        }
         else if(result == ERR_BUSY) { this.Creep.say("Not Aviable"); }
         else
             console.log(`[Harv] found ${this} creep status at ${STATUS_CODE[result]}`);
