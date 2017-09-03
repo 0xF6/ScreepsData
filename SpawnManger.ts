@@ -1,5 +1,6 @@
 import { XCreep } from "./XCreep";
 import { Guid } from "./Guid";
+import { List } from "./LinqTS";
 
 export class SpawnManager
 {
@@ -11,16 +12,25 @@ export class SpawnManager
 
         let body = [MOVE, CARRY, WORK, CARRY, CARRY];
 
-        if(providers > 1 && ((providers + builders + updaters) > 4))
-        {
-            body = [MOVE, CARRY, WORK, CARRY, CARRY, CARRY, WORK, WORK];
-        }
+        let sources = _.sum(Game.creeps, x => x.memory.Role == XCreep.SOURCES);
+        let lenSources = JSON.parse(RawMemory.segments[0]).lenSources;
 
+        if(sources < lenSources)
+        {
+            if(Game.spawns['Spawn1'].canCreateCreep([MOVE, WORK, WORK, WORK, CARRY]) == OK)
+            {
+                Game.spawns['Spawn1'].createCreep([MOVE, WORK, WORK, WORK, CARRY], "@" + Guid.newGuid()
+                    .ToString()
+                    .split('-')[0], { Role: XCreep.SOURCES });
+                return;
+            }
+            return;
+        }
         if(providers < 3)
         {
-            if(Game.spawns['Spawn1'].canCreateCreep(body) == OK)
+            if(Game.spawns['Spawn1'].canCreateCreep([MOVE, MOVE, MOVE, WORK, CARRY, CARRY]) == OK)
             {
-                Game.spawns['Spawn1'].createCreep(body, Guid.newGuid()
+                Game.spawns['Spawn1'].createCreep([MOVE, MOVE, MOVE, WORK, CARRY, CARRY], "p-" + Guid.newGuid()
                     .ToString()
                     .split('-')[0], { Role: XCreep.PROVIDER });
                 return;
@@ -29,18 +39,18 @@ export class SpawnManager
         }
         if(builders < 5)
         {
-            if(Game.spawns['Spawn1'].canCreateCreep(body) == OK)
+            if(Game.spawns['Spawn1'].canCreateCreep([MOVE, CARRY, WORK, WORK, CARRY]) == OK)
             {
-                Game.spawns['Spawn1'].createCreep(body, Guid.newGuid().ToString().split('-')[0],{Role: XCreep.BUILDER});
+                Game.spawns['Spawn1'].createCreep([MOVE, CARRY, WORK, WORK, CARRY],`b-${Guid.newGuid().ToString().split('-')[0]}`,{Role: XCreep.BUILDER});
                 return;
             }
             return;
         }
         if(updaters < 2)
         {
-            if(Game.spawns['Spawn1'].canCreateCreep(body) == OK)
+            if(Game.spawns['Spawn1'].canCreateCreep([MOVE, MOVE, MOVE, WORK, CARRY, CARRY]) == OK)
             {
-                Game.spawns['Spawn1'].createCreep(body, Guid.newGuid().ToString().split('-')[0],{Role: XCreep.UPDATER});
+                Game.spawns['Spawn1'].createCreep([MOVE, MOVE, MOVE, WORK, CARRY, CARRY], `u-${Guid.newGuid().ToString().split('-')[0]}`,{Role: XCreep.UPDATER});
                 return;
             }
             return;
