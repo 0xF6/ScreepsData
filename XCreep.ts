@@ -1,6 +1,7 @@
 import { XObject } from "./XObject";
 import { MathUtil } from "./MathUtil";
 import { STATUS_CODE } from "./StatusCode";
+import { List } from "./LinqTS";
 
 
 export class XCreep extends XObject
@@ -8,6 +9,7 @@ export class XCreep extends XObject
     public static UPDATER = "updater";
     public static PROVIDER = "provider";
     public static BUILDER = "builder";
+    public static SOURCES = "sources";
 
     public Creep : Creep;
 
@@ -52,6 +54,8 @@ export class XCreep extends XObject
 
     public Work(): void
     {
+        if(RawMemory.segments[0].indexOf("lenSources") == -1)
+        RawMemory.segments[0] = JSON.stringify({lenSources: new List<Source>(this.Creep.room.find(FIND_SOURCES)).Count()});
         if(this.Creep.carry.energy == 0)
             this.Creep.memory.isWork = true;
         else if(this.Creep.carry.energy == this.Creep.carryCapacity)
@@ -68,11 +72,75 @@ export class XCreep extends XObject
             case XCreep.BUILDER:
                 this.Build();
                 break;
+            case XCreep.SOURCES:
+                this.SourcesWork();
+                break;
             default:
                 this.UpgradeController();
                 break;
         }
     }
+    public SourcesWork()
+    {
+        let source: Source = this.Creep.pos.findClosestByPath(FIND_SOURCES);
+
+        if(this.Creep.memory.source == undefined)
+        {
+            if(this.Creep.memory.isLive === undefined)
+                this.Creep.memory.isLive = true;
+
+            let creeps : List<Creep> = new List();
+
+            for(let xcrp in Game.creeps)
+                creeps.Add(Game.creeps[xcrp]);
+
+            let csx = creeps.FirstOrDefault(x => x.memory.isLive !== undefined && x.memory.Role == XCreep.SOURCES && x.memory.source !== undefined);
+            let sources: List<Source> = new List<Source>(this.Creep.room.find(FIND_SOURCES));
+            if(csx == undefined)
+                this.Creep.memory.source = sources.First().id;
+            else
+            {
+                while(true)
+                {
+                    csx = creeps.FirstOrDefault(x =>
+                    x.memory.isLive !== undefined &&
+                    x.memory.Role === XCreep.SOURCES &&
+                    x.memory.source !== undefined);
+
+                    if(csx == undefined)
+                    {
+                        console.log("Error: Лишний крип роли (Sources)");
+                        return;
+                    }
+                    this.Creep.memory.source = sources.FirstOrDefault(x => x.id != csx.memory.source).id;
+                }
+            }
+            source = <Source>Game.getObjectById(this.Creep.memory.source);
+        }
+        else
+            source = <Source>Game.getObjectById(this.Creep.memory.source);
+
+
+        let result: STATUS_CODE = this.Creep.harvest(source);
+        if(result == ERR_NOT_IN_RANGE)
+            this.Move(source);
+        else if(result == OK)
+        {
+            if(this.Creep.carry.energy == this.Creep.carryCapacity)
+            {
+                this.Creep.drop(RESOURCE_ENERGY);
+
+
+
+            }
+            //let xcs = this.Creep.pos.findInRange(FIND_MY_STRUCTURES, 1, {filter:{ structureType: STRUCTURE_CONTAINER }});
+            //console.log(xcs[0]);
+        }
+        else if(result == ERR_BUSY) { this.Creep.say("Not Aviable"); }
+        else
+            console.log(`[Harv] found ${this} creep status at ${STATUS_CODE[result]}`);
+    }
+
     public Provide(): void
     {
         let target = this.Creep.pos.findClosestByPath(FIND_MY_STRUCTURES,
@@ -193,7 +261,7 @@ export class XCreep extends XObject
                 this.Move(energy[0]);
                 res = OK;
             }
-            console.log(`[${STATUS_CODE[res]}] found ${energy[0].amount} energy at ${energy[0].pos}`);
+            //console.log(`[${STATUS_CODE[res]}] found ${energy[0].amount} energy at ${energy[0].pos}`);
             return;
         }
 
@@ -217,11 +285,11 @@ export class XCreep extends XObject
             this.Move(source);
         else if(result == OK)
         {
-            if(this.getRole == XCreep.BUILDER)
-            {
-                let target : ConstructionSite = this.Creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
-                const res = this.Creep.build(target);
-            }
+            //if(this.getRole == XCreep.BUILDER)
+            //{
+            //    let target : ConstructionSite = this.Creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
+            //    const res = this.Creep.build(target);
+            //}
         }
         else if(result == ERR_BUSY) { this.Creep.say("Not Aviable"); }
         else
