@@ -129,12 +129,7 @@ export class XCreep extends XObject
             if(this.Creep.carry.energy == this.Creep.carryCapacity)
             {
                 this.Creep.drop(RESOURCE_ENERGY);
-
-
-
             }
-            //let xcs = this.Creep.pos.findInRange(FIND_MY_STRUCTURES, 1, {filter:{ structureType: STRUCTURE_CONTAINER }});
-            //console.log(xcs[0]);
         }
         else if(result == ERR_BUSY) { this.Creep.say("Not Aviable"); }
         else
@@ -261,8 +256,32 @@ export class XCreep extends XObject
                 this.Move(energy[0]);
                 res = OK;
             }
-            //console.log(`[${STATUS_CODE[res]}] found ${energy[0].amount} energy at ${energy[0].pos}`);
             return;
+        }
+        else
+        {
+            let container = new List<Container>(this.Creep.pos.findInRange(FIND_STRUCTURES, 5, {filter:{ structureType: STRUCTURE_CONTAINER }}));
+
+            if(container.Count() != 0)
+            {
+                let xContainer = container.FirstOrDefault(
+                    x => x.store != undefined &&
+                    x.store.energy != undefined &&
+                    x.store.energy != 0);
+                if(xContainer == undefined)
+                return;
+                else
+                {
+                    let res = this.Creep.withdraw(xContainer, RESOURCE_ENERGY);
+                    if(res == ERR_NOT_IN_RANGE)
+                    {
+                        this.Move(xContainer);
+                        return;
+                    }
+                    else if(res == OK)
+                        return;
+                }
+            }
         }
 
 
