@@ -268,8 +268,11 @@ export class XCreep extends XObject
                     x => x.store != undefined &&
                     x.store.energy != undefined &&
                     x.store.energy != 0);
-                if(xContainer == undefined)
-                return;
+                if(xContainer == undefined || xContainer.store == undefined || xContainer.store.energy == undefined || xContainer.store.energy < this.Creep.carryCapacity)
+                {
+                    this.RandomMove();
+                    return;
+                }
                 else
                 {
                     let res = this.Creep.withdraw(xContainer, RESOURCE_ENERGY);
@@ -314,6 +317,11 @@ export class XCreep extends XObject
         else
             console.log(`[Harv] found ${this} creep status at ${STATUS_CODE[result]}`);
     }
+    public RandomMove()
+    {
+        this.Creep.move(MathUtil.getRandom(1, 8));
+    }
+
     public toString(): string
     {
         return `(${this.getRole})[${this.getID().ToString().split('-')[0]}]`;
