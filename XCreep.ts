@@ -10,6 +10,7 @@ export class XCreep extends XObject
     public static PROVIDER = "provider";
     public static BUILDER = "builder";
     public static SOURCES = "sources";
+    public static FILLER = "filler";
 
     public Creep : Creep;
 
@@ -74,6 +75,9 @@ export class XCreep extends XObject
                 break;
             case XCreep.SOURCES:
                 this.SourcesWork();
+                break;
+            case XCreep.FILLER:
+                this.FillerStorageWork();
                 break;
             default:
                 this.UpgradeController();
@@ -239,7 +243,84 @@ export class XCreep extends XObject
         else
             console.log(`[Upd] found ${this} creep status at ${STATUS_CODE[result]}`);
     }
+    public FillerStorageWork()
+    {
+        if(this.isWork())
+        {
+            let energy: Array<Resource> = this.Creep.pos.findInRange(FIND_DROPPED_RESOURCES, 5);
+            if (energy.length)
+            {
+                let res = this.Creep.pickup(energy[0]);
+                if(res == ERR_NOT_IN_RANGE)
+                {
+                    this.Move(energy[0]);
+                    res = OK;
+                }
+                return;
+            }
+            let container = new List<Container>(this.Creep.pos.findInRange(FIND_STRUCTURES, 500, {filter:{ structureType: STRUCTURE_CONTAINER }}));
 
+            if(container.Count() != 0)
+            {
+                let xContainer = container.FirstOrDefault(
+                    x => x.store != undefined &&
+                    x.store.energy != undefined &&
+                    x.store.energy != 0);
+                if(xContainer == undefined || xContainer.store == undefined || xContainer.store.energy == undefined || xContainer.store.energy < this.Creep.carryCapacity)
+                {
+                    let source: Source = this.Creep.pos.findClosestByPath(FIND_SOURCES);
+
+                    if(this.Creep.memory.sourceIndex == undefined)
+                    {
+                        let sources: Array<Source> = this.Creep.room.find(FIND_SOURCES);
+                        let indexRandom = MathUtil.getRandom(0, sources.length - 1);
+                        this.Creep.memory.sourceIndex = indexRandom;
+                        source = sources[indexRandom];
+                    }
+                    else
+                        source = <Source>this.Creep.room.find(FIND_SOURCES)[this.Creep.memory.sourceIndex];
+
+
+
+                    let result: STATUS_CODE = this.Creep.harvest(source);
+                    if(result == ERR_NOT_IN_RANGE)
+                        this.Move(source);
+                    else if(result == OK){ }
+                    else if(result == ERR_BUSY) { this.Creep.say("Not Aviable"); }
+                    else
+                        console.log(`[Harv] found ${this} creep status at ${STATUS_CODE[result]}`);
+                    return;
+                }
+                else
+                {
+                    let res = this.Creep.withdraw(xContainer, RESOURCE_ENERGY);
+                    if(res == ERR_NOT_IN_RANGE)
+                    {
+                        this.Move(xContainer);
+                        return;
+                    }
+                    else if(res == OK)
+                        return;
+                }
+            }
+        }
+        else
+        {
+            let storage = new List<Container>(this.Creep.pos.findInRange(FIND_STRUCTURES, 150, {filter:{ structureType: STRUCTURE_STORAGE }})).FirstOrDefault();
+            if(storage == undefined)
+            {
+                this.Creep.say("ERROR");
+                Game.notify("ERROR: STORAGE NOT FOUND!");
+                return;
+            }
+            this.Transfer(storage);
+        }
+    }
+
+    public isWork() : boolean
+    {
+        return this.Creep.memory.isWork;
+    }
     public MoveToRoom(roomPos: RoomPosition): void
     {
 
@@ -247,6 +328,21 @@ export class XCreep extends XObject
 
     public Harvest(): void
     {
+
+
+        let storage = new List<StructureStorage>(this.Creep.pos.findInRange(FIND_STRUCTURES, 500, {filter:{ structureType: STRUCTURE_STORAGE }})).FirstOrDefault();
+
+
+        if(storage != undefined && storage.store != undefined && storage.store.energy != undefined && storage.store.energy > 5000)
+        {
+            let a = this.Creep.withdraw(storage, RESOURCE_ENERGY);
+            if(a == ERR_NOT_IN_RANGE)
+            {
+                this.Move(storage);
+                return;
+            }
+        }
+
         let energy: Array<Resource> = this.Creep.pos.findInRange(FIND_DROPPED_RESOURCES, 5);
         if (energy.length)
         {

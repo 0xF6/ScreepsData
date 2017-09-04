@@ -9,6 +9,7 @@ export class SpawnManager
         let providers = _.sum(Game.creeps, (x) => x.memory.Role == XCreep.PROVIDER);
         let builders = _.sum(Game.creeps, (x) => x.memory.Role == XCreep.BUILDER);
         let updaters = _.sum(Game.creeps, (x) => x.memory.Role == XCreep.UPDATER);
+        let filler = _.sum(Game.creeps, x => x.memory.Role == XCreep.FILLER);
 
         let body = [MOVE, CARRY, WORK, CARRY, CARRY];
 
@@ -17,11 +18,22 @@ export class SpawnManager
 
         if(sources < lenSources)
         {
-            if(Game.spawns['Spawn1'].canCreateCreep([MOVE, WORK, WORK, WORK, CARRY]) == OK)
+            if(Game.spawns['Spawn1'].canCreateCreep([MOVE,MOVE, WORK, WORK, WORK,WORK,WORK, CARRY,CARRY]) == OK)
             {
-                Game.spawns['Spawn1'].createCreep([MOVE, WORK, WORK, WORK, CARRY], "@" + Guid.newGuid()
+                Game.spawns['Spawn1'].createCreep([MOVE,MOVE, WORK, WORK, WORK,WORK,WORK, CARRY,CARRY], "@" + Guid.newGuid()
                     .ToString()
                     .split('-')[0], { Role: XCreep.SOURCES });
+                return;
+            }
+            return;
+        }
+        if(filler < 2)
+        {
+            if(Game.spawns['Spawn1'].canCreateCreep([MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, WORK]) == OK)
+            {
+                Game.spawns['Spawn1'].createCreep([MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, WORK], "&" + Guid.newGuid()
+                        .ToString()
+                        .split('-')[0], { Role: XCreep.FILLER });
                 return;
             }
             return;
