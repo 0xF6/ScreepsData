@@ -46,7 +46,7 @@ export class XCreep extends XObject
             return;
         }
 
-        let result = target.transfer(this.Creep, RESOURCE_ENERGY);
+        let result = this.Creep.withdraw(target, RESOURCE_ENERGY);
         if(result == ERR_NOT_IN_RANGE)
             this.Move(target);
         else if(result == ERR_NOT_ENOUGH_RESOURCES)
@@ -158,16 +158,7 @@ export class XCreep extends XObject
         }
         else
         {
-            let targetStorage = this.Creep.pos.findClosestByPath(FIND_MY_STRUCTURES,
-                {
-                    filter: (x) =>
-                    x.structureType == STRUCTURE_STORAGE &&
-                    x.energy != x.storeCapacity
-                });
-            if(!this.Creep.memory.isWork)
-                this.Transfer(targetStorage);
-            else
-                this.Harvest();
+            this.UpgradeController();
         }
     }
     public Move(target: Structure | Source | ConstructionSite | Resource): void
@@ -259,14 +250,18 @@ export class XCreep extends XObject
                 return;
             }
             let container = new List<Container>(this.Creep.pos.findInRange(FIND_STRUCTURES, 500, {filter:{ structureType: STRUCTURE_CONTAINER }}));
-
+            console.log(container.Count());
+            console.log(container.First());
+            console.log(container.FirstOrDefault(
+                x => x.store != undefined &&
+                x.store.energy != undefined &&
+                x.store.energy < this.Creep.carryCapacity));
             if(container.Count() != 0)
             {
-                let xContainer = container.FirstOrDefault(
+                let xContainer = container.OrderBy(x => x.store.energy).FirstOrDefault(
                     x => x.store != undefined &&
-                    x.store.energy != undefined &&
-                    x.store.energy != 0);
-                if(xContainer == undefined || xContainer.store == undefined || xContainer.store.energy == undefined || xContainer.store.energy < this.Creep.carryCapacity)
+                    x.store.energy != undefined && x.store.energy >= this.Creep.carryCapacity);
+                if(xContainer == undefined || xContainer.store == undefined || xContainer.store.energy == undefined )
                 {
                     let source: Source = this.Creep.pos.findClosestByPath(FIND_SOURCES);
 
