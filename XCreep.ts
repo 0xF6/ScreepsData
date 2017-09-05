@@ -12,24 +12,60 @@ export class XCreep extends XObject
     public static SOURCES = "sources";
     public static FILLER = "filler";
 
-    public Creep : Creep;
+    public static LANCER = "lancer";
+    public static RAIDER = "raider";
 
-    constructor(creep : Creep)
+    public Creep: Creep;
+
+    constructor(creep: Creep)
     {
         super();
         this.Creep = creep;
     }
+
     public get getRole()
     {
         return this.Creep.memory.Role;
     }
+
     public Transfer(target): void
     {
         let result = this.Creep.transfer(target, RESOURCE_ENERGY);
         if(result == ERR_NOT_IN_RANGE)
             this.Move(target);
-        else if(result == OK) {}
+        else if(result == OK)
+        {
+        }
         else this.UpgradeController();
+    }
+
+
+    public getRandomSay(): string
+    {
+        let lst: List<string> = new List();
+
+        lst.Add("Ni!");
+        lst.Add("Kiya!");
+        lst.Add("Ko!");
+        lst.Add("Ni!");
+
+        return lst.ElementAt(MathUtil.getRandom(0, lst.Count() - 1));
+    }
+
+
+    public RangeAttack()
+    {
+        let enemyCreeps : Array<Creep> = _.filter(this.Creep.room.find(FIND_CREEPS), (x : Creep) => !x.my);
+        if(enemyCreeps.length != 0)
+        {
+            this.Creep.say(this.getRandomSay(), true);
+            this.Creep.heal(this.Creep);
+            if(this.Creep.rangedAttack(enemyCreeps[0]) == ERR_NOT_IN_RANGE)
+                this.Move(enemyCreeps[0]);
+            return;
+        }
+        this.Move(Game.flags["1"]);
+        this.Creep.heal(this.Creep);
     }
 
     public Fill(): void
@@ -78,6 +114,9 @@ export class XCreep extends XObject
                 break;
             case XCreep.FILLER:
                 this.FillerStorageWork();
+                break;
+            case XCreep.LANCER:
+                this.RangeAttack();
                 break;
             default:
                 this.UpgradeController();
@@ -146,8 +185,7 @@ export class XCreep extends XObject
             {
                 filter: (x) =>
                 x.structureType == STRUCTURE_EXTENSION && x.energy != 50 ||
-                x.structureType == STRUCTURE_SPAWN && x.energy != 300 ||
-                x.structureType == STRUCTURE_TOWER && x.energy != 1000
+                x.structureType == STRUCTURE_SPAWN && x.energy != 300
             });
         if(target != null)
         {
@@ -155,13 +193,25 @@ export class XCreep extends XObject
                 this.Transfer(target);
             else
                 this.Fill();
+            return;
+        }
+
+        let target2 = this.Creep.pos.findClosestByPath(FIND_MY_STRUCTURES,
+            {
+                filter: (x) =>
+                x.structureType == STRUCTURE_TOWER && x.energy != 1000
+            });
+        if(target2 != null)
+        {
+            if(!this.Creep.memory.isWork)
+                this.Transfer(target2);
+            else
+                this.Fill();
         }
         else
-        {
             this.UpgradeController();
-        }
     }
-    public Move(target: Structure | Source | ConstructionSite | Resource): void
+    public Move(target: Structure | Source | ConstructionSite | Resource | Creep | Flag): void
     {
         if(this.Creep.moveTo(target, {visualizePathStyle: this.getVisualStyle() }) == ERR_INVALID_TARGET)
         {
@@ -247,15 +297,9 @@ export class XCreep extends XObject
                     this.Move(energy[0]);
                     res = OK;
                 }
-                return;
             }
-            let container = new List<Container>(this.Creep.pos.findInRange(FIND_STRUCTURES, 500, {filter:{ structureType: STRUCTURE_CONTAINER }}));
-            console.log(container.Count());
-            console.log(container.First());
-            console.log(container.FirstOrDefault(
-                x => x.store != undefined &&
-                x.store.energy != undefined &&
-                x.store.energy < this.Creep.carryCapacity));
+            let container = new List<Container>(this.Creep.pos.findInRange(FIND_STRUCTURES, 100, {filter:{ structureType: STRUCTURE_CONTAINER }}));
+
             if(container.Count() != 0)
             {
                 let xContainer = container.OrderBy(x => x.store.energy).FirstOrDefault(
