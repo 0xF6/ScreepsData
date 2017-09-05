@@ -2,6 +2,7 @@ import { XObject } from "./XObject";
 import { MathUtil } from "./MathUtil";
 import { STATUS_CODE } from "./StatusCode";
 import { List } from "./LinqTS";
+import { XGame } from "./XGame";
 
 
 export class XCreep extends XObject

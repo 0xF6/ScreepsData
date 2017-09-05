@@ -47,7 +47,7 @@ var XTower = (function (_super) {
             if (targets != undefined || targets != null)
                 this._tower.repair(targets);
             else {
-                var lstStructures_1 = new LinqTS_1.List(_.filter(this._tower.room.find(FIND_STRUCTURES), function (x) { return x.structureType == STRUCTURE_WALL && x.hits <= (x.hitsMax / 100); }));
+                var lstStructures_1 = new LinqTS_1.List(_.filter(this._tower.room.find(FIND_STRUCTURES), function (x) { return x.structureType == STRUCTURE_WALL && x.hits <= 100000; }));
                 if (lstStructures_1.Count() != 0)
                     targets = lstStructures_1.ElementAtOrDefault(MathUtil_1.MathUtil.getRandom(0, lstStructures_1.Count() - 1));
                 else
