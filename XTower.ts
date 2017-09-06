@@ -1,7 +1,7 @@
 import { XObject } from "./XObject";
 import { List } from "./LinqTS";
 import { MathUtil } from "./MathUtil";
-
+import { Utils } from "./Utils";
 
 export class XTower extends XObject
 {
@@ -37,8 +37,7 @@ export class XTower extends XObject
             this._tower.repair(targets);
         else
         {
-            let lstStructures = new List<Structure>(_.filter(this._tower.room.find(FIND_STRUCTURES), (x : Structure) => x.structureType == STRUCTURE_RAMPART && x.hits <= (x.hitsMax / 100)));
-
+            let lstStructures = new List<Structure>(_.filter(this._tower.room.find(FIND_STRUCTURES), (x : Structure) => x.structureType == STRUCTURE_RAMPART && x.hits <= Utils.getLevelRampact()));
 
             if(lstStructures.Count() != 0)
                 targets = lstStructures.ElementAtOrDefault(MathUtil.getRandom(0, lstStructures.Count() - 1));
@@ -46,17 +45,23 @@ export class XTower extends XObject
                 targets = null;
 
             if(targets != undefined || targets != null)
-                this._tower.repair(targets);
+            {
+                if(Utils.isAllowRepairRampact(Utils.getStorage(this._tower)))
+                    this._tower.repair(targets);
+            }
             else
             {
-                let lstStructures = new List<Structure>(_.filter(this._tower.room.find(FIND_STRUCTURES), (x : Structure) => x.structureType == STRUCTURE_WALL && x.hits <= 100000));
+                let lstStructures = new List<Structure>(_.filter(this._tower.room.find(FIND_STRUCTURES), (x : Structure) => x.structureType == STRUCTURE_WALL && x.hits <= Utils.getLevelWall()));
 
                 if(lstStructures.Count() != 0)
                     targets = lstStructures.ElementAtOrDefault(MathUtil.getRandom(0, lstStructures.Count() - 1));
                 else
                     targets = null;
                 if(targets != undefined || targets != null)
+                {
+                    if(Utils.isAllowRepairWall(Utils.getStorage(this._tower)))
                     this._tower.repair(targets);
+                }
             }
         }
     }

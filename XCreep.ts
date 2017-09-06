@@ -2,7 +2,6 @@ import { XObject } from "./XObject";
 import { MathUtil } from "./MathUtil";
 import { STATUS_CODE } from "./StatusCode";
 import { List } from "./LinqTS";
-import { XGame } from "./XGame";
 
 
 export class XCreep extends XObject
@@ -57,6 +56,7 @@ export class XCreep extends XObject
     public RangeAttack()
     {
         let enemyCreeps : Array<Creep> = _.filter(this.Creep.room.find(FIND_CREEPS), (x : Creep) => !x.my);
+
         if(enemyCreeps.length != 0)
         {
             this.Creep.say(this.getRandomSay(), true);
@@ -65,6 +65,7 @@ export class XCreep extends XObject
                 this.Move(enemyCreeps[0]);
             return;
         }
+        this.Creep.rangedMassAttack();
         this.Move(Game.flags["1"]);
         this.Creep.heal(this.Creep);
     }

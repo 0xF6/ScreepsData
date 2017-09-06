@@ -39,9 +39,9 @@ export class SpawnConfig
             case ControllerLevel.RCL1:
                 return null; // Disable this role in 1 level
             case ControllerLevel.RCL2:
-                return new SpawnConfig(lvl, [MOVE, CARRY, WORK], XCreep.PROVIDER, "p-", 2);
+                return new SpawnConfig(lvl, [MOVE, CARRY, WORK], XCreep.PROVIDER, "p-", 3);
             case ControllerLevel.RCL3:
-                return new SpawnConfig(lvl, [MOVE, CARRY, CARRY, WORK], XCreep.PROVIDER, "p-", 2);
+                return new SpawnConfig(lvl, [MOVE, CARRY, CARRY, WORK], XCreep.PROVIDER, "p-", 3);
             case ControllerLevel.RCL4:
                 return new SpawnConfig(lvl, [MOVE, CARRY, WORK, CARRY, CARRY], XCreep.PROVIDER, "p-", 3);
             case ControllerLevel.RCL5:
@@ -98,11 +98,11 @@ export class SpawnConfig
         switch(lvl)
         {
             case ControllerLevel.RCL1:
-                return new SpawnConfig(lvl, [MOVE, CARRY, WORK], XCreep.BUILDER, "b-", 2);
+                return new SpawnConfig(lvl, [MOVE, CARRY, WORK], XCreep.BUILDER, "b-", 3);
             case ControllerLevel.RCL2:
-                return new SpawnConfig(lvl, [MOVE, CARRY, CARRY, WORK], XCreep.BUILDER, "b-", 2);
+                return new SpawnConfig(lvl, [MOVE, CARRY, CARRY, WORK], XCreep.BUILDER, "b-", 3);
             case ControllerLevel.RCL3:
-                return new SpawnConfig(lvl, [MOVE, MOVE, CARRY, CARRY, CARRY, WORK, WORK, WORK], XCreep.BUILDER, "b-", 2);
+                return new SpawnConfig(lvl, [MOVE, MOVE, CARRY, CARRY, CARRY, WORK, WORK, WORK], XCreep.BUILDER, "b-", 3);
             case ControllerLevel.RCL4:
                 return new SpawnConfig(lvl, [MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, WORK, WORK, WORK, WORK], XCreep.BUILDER, "b-", 3);
             case ControllerLevel.RCL5:
